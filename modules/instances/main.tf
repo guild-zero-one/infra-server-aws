@@ -1,4 +1,3 @@
-# Gera a chave SSH
 resource "tls_private_key" "ssh_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -9,10 +8,9 @@ resource "aws_key_pair" "ssh_key" {
   public_key = tls_private_key.ssh_key.public_key_openssh
 }
 
-# Pega a última AMI oficial do Ubuntu 22.04 LTS
 data "aws_ami" "ubuntu" {
   most_recent = true
-  owners      = ["099720109477"] # Canonical
+  owners      = ["099720109477"]
 
   filter {
     name   = "name"
@@ -25,7 +23,6 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-# Cria a instância EC2
 resource "aws_instance" "simlady_ec2_publica" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.instance_type
