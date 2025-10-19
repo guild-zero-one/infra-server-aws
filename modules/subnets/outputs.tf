@@ -1,9 +1,15 @@
 output "public_subnet_id" {
-  value       = aws_subnet.simlady-public-subnet.id
-  description = "ID da subrede publica"
+  value = aws_subnet.public_subnet.id
 }
 
 output "private_subnet_id" {
-  value       = aws_subnet.simlady-private-subnet.id
-  description = "ID da subrede privada"
+  value = aws_subnet.private_subnet.id
+}
+
+output "public_subnet_ids" {
+  value = [aws_subnet.public_subnet.id]
+}
+
+output "private_subnet_ids" {
+  value = [aws_subnet.private_subnet.id]
 }
