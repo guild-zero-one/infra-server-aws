@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        REPO_URL = 'https://github.com/guild-zero-one/backend-server.git'
-        DEPLOY_DIR = '/var/www/backend-server'
-        BRANCH = 'feat/docker-compose'
+        REPO_URL = 'https://github.com/guild-zero-one/infra-server-aws.git'
+        DEPLOY_DIR = '/var/www/deploy'
+        BRANCH = 'main'
     }
 
     stages {
@@ -16,6 +16,8 @@ pipeline {
                 sudo apt install ca-certificates -y
                 sudo update-ca-certificates -y
                 sudo apt install maven -y
+                sudo apt install nodejs -y
+                sudo apt install npm -y
                 '''
             }
         }
