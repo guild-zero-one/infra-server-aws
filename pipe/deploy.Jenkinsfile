@@ -11,8 +11,12 @@ pipeline {
         stage('Update EC2') {
             steps {
                 sh '''
-                sudo apt update -y
+                sudo dpkg --configure -a
+
+                sudo apt autoremove -y
+
                 sudo apt upgrade -y
+                sudo apt update -y
                 sudo apt install ca-certificates -y
                 sudo update-ca-certificates -y
                 sudo apt install maven -y
