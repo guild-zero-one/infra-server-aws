@@ -20,7 +20,7 @@ resource "aws_subnet" "private_subnet" {
 }
 
 
-resource "aws_route_table" "public" {
+resource "aws_route_table" "public_rt" {
   vpc_id = var.vpc_id
 
   route {
@@ -32,3 +32,22 @@ resource "aws_route_table" "public" {
     Name = "public-rt"
   }
 }
+
+resource "aws_route_table" "private_rt" {
+  vpc_id = var.vpc_id
+
+  tags = {
+    Name = "private-rt"
+  }
+}
+
+resource "aws_route_table_association" "public" {
+  subnet_id      = aws_subnet.public_subnet.id
+  route_table_id = aws_route_table.public_rt.id
+}
+
+resource "aws_route_table_association" "private" {
+  subnet_id      = aws_subnet.private_subnet.id
+  route_table_id = aws_route_table.private_rt.id
+}
+
