@@ -53,6 +53,54 @@ pipeline {
             }
         }
 
+        stage('Create .env file') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'SERPAPI_API_KEY', variable: 'SERPAPI_API_KEY'),
+                    string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
+                    string(credentialsId: 'GEMINI_API_KEY', variable: 'GEMINI_API_KEY'),
+                    string(credentialsId: 'BOT_TOKEN', variable: 'BOT_TOKEN'),
+                    string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
+                    string(credentialsId: 'DB_PORT', variable: 'DB_PORT'),
+                    string(credentialsId: 'DB_USER', variable: 'DB_USER'),
+                    string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
+                    string(credentialsId: 'DB_NAME', variable: 'DB_NAME'),
+                    string(credentialsId: 'SPRING_PROFILES_ACTIVE', variable: 'SPRING_PROFILES_ACTIVE'),
+                    string(credentialsId: 'SPRING_RABBITMQ_HOST', variable: 'SPRING_RABBITMQ_HOST'),
+                    string(credentialsId: 'SPRING_RABBITMQ_PORT', variable: 'SPRING_RABBITMQ_PORT'),
+                    string(credentialsId: 'SPRING_RABBITMQ_USERNAME', variable: 'SPRING_RABBITMQ_USERNAME'),
+                    string(credentialsId: 'SPRING_RABBITMQ_PASSWORD', variable: 'SPRING_RABBITMQ_PASSWORD'),
+                    string(credentialsId: 'SYSADMIN_USER', variable: 'SYSADMIN_USER'),
+                    string(credentialsId: 'SYSADMIN_EMAIL', variable: 'SYSADMIN_EMAIL'),
+                    string(credentialsId: 'SYSADMIN_PASSWORD', variable: 'SYSADMIN_PASSWORD')
+                ]) {
+                    sh """
+                    cd ${DEPLOY_DIR}
+                    cat > .env << EOF
+SERPAPI_API_KEY=${SERPAPI_API_KEY}
+JWT_SECRET=${JWT_SECRET}
+GEMINI_API_KEY=${GEMINI_API_KEY}
+BOT_TOKEN=${BOT_TOKEN}
+DB_HOST=${DB_HOST}
+DB_PORT=${DB_PORT}
+DB_USER=${DB_USER}
+DB_PASSWORD=${DB_PASSWORD}
+DB_NAME=${DB_NAME}
+SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+SPRING_RABBITMQ_HOST=${SPRING_RABBITMQ_HOST}
+SPRING_RABBITMQ_PORT=${SPRING_RABBITMQ_PORT}
+SPRING_RABBITMQ_USERNAME=${SPRING_RABBITMQ_USERNAME}
+SPRING_RABBITMQ_PASSWORD=${SPRING_RABBITMQ_PASSWORD}
+SYSADMIN_USER=${SYSADMIN_USER}
+SYSADMIN_EMAIL=${SYSADMIN_EMAIL}
+SYSADMIN_PASSWORD=${SYSADMIN_PASSWORD}
+EOF
+                    chmod 600 .env
+                    """
+                }
+            }
+        }
+
         stage('Deploy na EC2') {
             steps {
                 sh """

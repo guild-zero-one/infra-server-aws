@@ -1,120 +1,63 @@
 services:
-  frontend1:
+  frontend:
     image: giobels/simlady-stock:latest
-    container_name: simlady-stock-frontend1
+    container_name: simlady-stock-frontend
     restart: unless-stopped
     ports:
-      - "3001:3001"
+      - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_URL: "http://backend1:8081"
-      NEXT_PUBLIC_PDF_API_URL: ""
-      SERPAPI_API_KEY: "3927d73ee04af1820f18a3b5520d9f2fd11568a9619e1299db0aa111fae6f201"
-      JWT_SECRET: "RpYSBhbGd16W0gZGVzY29icmlyRX9yaWEgcXVlIGRpeitYSB0ZWdWUsIHNlIHVtIG"
+      NEXT_PUBLIC_API_URL: "http://backend:8000"
+      NEXT_PUBLIC_PDF_API_URL: "http://ia:30000"
+      SERPAPI_API_KEY: ${SERPAPI_API_KEY}
+      JWT_SECRET: ${JWT_SECRET}
 
-  frontend2:
-    image: giobels/simlady-stock:latest
-    container_name: simlady-stock-frontend2
-    restart: unless-stopped
-    ports:
-      - "3002:3002"
-    environment:
-      NEXT_PUBLIC_API_URL: "http://backend2:8082"
-      NEXT_PUBLIC_PDF_API_URL: ""
-      SERPAPI_API_KEY: "3927d73ee04af1820f18a3b5520d9f2fd11568a9619e1299db0aa111fae6f201"
-      JWT_SECRET: "RpYSBhbGd16W0gZGVzY29icmlyRX9yaWEgcXVlIGRpeitYSB0ZWdWUsIHNlIHVtIG"
-
-  frontend3:
-    image: giobels/simlady-stock:latest
-    container_name: simlady-stock-frontend3
-    restart: unless-stopped
-    ports:
-      - "3003:3003"
-    environment:
-      NEXT_PUBLIC_API_URL: "http://backend3:8083"
-      NEXT_PUBLIC_PDF_API_URL: ""
-      SERPAPI_API_KEY: "3927d73ee04af1820f18a3b5520d9f2fd11568a9619e1299db0aa111fae6f201"
-      JWT_SECRET: "RpYSBhbGd16W0gZGVzY29icmlyRX9yaWEgcXVlIGRpeitYSB0ZWdWUsIHNlIHVtIG"
-
-  backend1:
+  backend:
     image: giobels/simlady-backend:latest
-    container_name: simlady-back1
+    container_name: simlady-backend
     restart: unless-stopped
     ports:
-      - "8081:8081"
+      - "8000:8000"
     environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: admin
-      SPRING_RABBITMQ_PASSWORD: 123456
-      SPRING_PROFILES_ACTIVE: prod
-      POSTGRESQL_URL: "jdbc:postgresql://postgres:5432/postgres?user=simlady&password=123456"
-      POSTGRESQL_USERNAME: "simlady"
-      POSTGRESQL_PASSWORD: "123456"
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_RABBITMQ_HOST: ${SPRING_RABBITMQ_HOST}
+      SPRING_RABBITMQ_PORT: ${SPRING_RABBITMQ_PORT}
+      SPRING_RABBITMQ_USERNAME: ${SPRING_RABBITMQ_USERNAME}
+      SPRING_RABBITMQ_PASSWORD: ${SPRING_RABBITMQ_PASSWORD}
+      POSTGRESQL_URL: "jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}?user=${DB_USER}&password=${DB_PASSWORD}"
+      POSTGRESQL_USERNAME: ${DB_USER}
+      POSTGRESQL_PASSWORD: ${DB_PASSWORD}
+      SYSADMIN_USER: ${SYSADMIN_USER}
+      SYSADMIN_EMAIL: ${SYSADMIN_EMAIL}
+      SYSADMIN_PASSWORD: ${SYSADMIN_PASSWORD}
     depends_on:
       rabbitmq:
         condition: service_healthy
 
-  backend2:
-    image: giobels/simlady-backend:latest
-    container_name: simlady-back2
+  ia:
+    image: giobels/simlady-pypdf:latest
+    container_name: simlady-ia
     restart: unless-stopped
     ports:
-      - "8082:8082"
+      - "30000:30000"
     environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: admin
-      SPRING_RABBITMQ_PASSWORD: 123456
-      SPRING_PROFILES_ACTIVE: prod
-      POSTGRESQL_URL: "jdbc:postgresql://postgres:5432/postgres?user=simlady&password=123456"
-      POSTGRESQL_USERNAME: "simlady"
-      POSTGRESQL_PASSWORD: "123456"
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
 
-  backend3:
-    image: giobels/simlady-backend:latest
-    container_name: simlady-back3
-    restart: unless-stopped
-    ports:
-      - "8083:8083"
-    environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: simlady
-      SPRING_RABBITMQ_PASSWORD: 123456
-      SPRING_PROFILES_ACTIVE: prod
-      POSTGRESQL_URL: "jdbc:postgresql://postgres:5432/postgres?user=simlady&password=123456"
-      POSTGRESQL_USERNAME: "simlady"
-      POSTGRESQL_PASSWORD: "123456"
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
   postgres17:
     image: postgres:17
     container_name: postgres17
     environment:
-      POSTGRES_DB: simlady
-      POSTGRES_USER: simlady
-      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     networks:
       - pg-network
-
-  pgadmin4:
-    image: dpage/pgadmin4
-    container_name: pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@simlady.com
-      PGADMIN_DEFAULT_PASSWORD: 123456
-    ports:
-      - "54321:54321"
-    networks:
-      - pg-network
-    depends_on:
-      - postgres17
 
   rabbitmq:
     image: rabbitmq:3.12-management
@@ -123,8 +66,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: simlady
-      RABBITMQ_DEFAULT_PASS: 123456
+      RABBITMQ_DEFAULT_USER: ${SPRING_RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${SPRING_RABBITMQ_PASSWORD}
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 5s
@@ -138,12 +81,12 @@ services:
     ports:
       - "8084:8084"
     environment:
-      SPRING_PROFILES_ACTIVE: prod
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: simlady
-      SPRING_RABBITMQ_PASSWORD: 123456
-      BOT_TOKEN: "8157297542:AAFxo0VOoGTywHLAN7rBXGvW96TFBRRTdrE"
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_RABBITMQ_HOST: ${SPRING_RABBITMQ_HOST}
+      SPRING_RABBITMQ_PORT: ${SPRING_RABBITMQ_PORT}
+      SPRING_RABBITMQ_USERNAME: ${SPRING_RABBITMQ_USERNAME}
+      SPRING_RABBITMQ_PASSWORD: ${SPRING_RABBITMQ_PASSWORD}
+      BOT_TOKEN: ${BOT_TOKEN}
 
 networks:
   pg-network:
