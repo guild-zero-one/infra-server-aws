@@ -9,7 +9,6 @@ module "subnets" {
   vpc_id                 = module.vpc.id
   vpc_cdir_block_public  = var.vpc_cdir_block_public
   vpc_cdir_block_private = var.vpc_cdir_block_private
-  internet_gateway_id    = module.igw.id
 }
 
 module "igw" {
@@ -25,7 +24,35 @@ module "network_acl" {
   environment = var.environment
 }
 
+module "rt_public" {
+  source = "../modules/route_table"
 
+  vpc_id             = module.vpc.id
+  internet_gateway_id = module.igw.id
+  route_table_name   = "public-rt"
+  subnet_id          = module.subnets.public_subnet_id  
+}
+
+module "rt_private" {
+  source = "../modules/route_table"
+
+  vpc_id           = module.vpc.id
+  nat_gateway_id   = module.nat_gateway.id
+  route_table_name = "private-rt"
+  subnet_id        = module.subnets.private_subnet_id
+}
+
+module "nat_gateway" {
+  source = "../modules/nat_gateway"
+
+  vpc_id              = module.vpc.id
+  public_subnet_id    = module.subnets.public_subnet_id
+  private_subnet_ids  = [module.subnets.private_subnet_id]
+  internet_gateway_id = module.igw.id
+  environment         = var.environment
+}
+
+//Recursos de computação
 # module "simlady_ec2_publica" {
 #   source             = "../modules/instances"
 #   subnet_id          = module.subnets.public_subnet_id
@@ -48,12 +75,4 @@ module "network_acl" {
 #   vpc_id = module.vpc.id
 # }
 
-# module "nat_gateway" {
-#   source = "../modules/nat_gateway"
 
-#   vpc_id              = module.vpc.id
-#   public_subnet_id    = module.subnets.public_subnet_id
-#   private_subnet_ids  = [module.subnets.private_subnet_id]
-#   internet_gateway_id = module.igw.id
-#   environment         = var.environment
-# }

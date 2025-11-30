@@ -14,8 +14,3 @@ variable "vpc_cdir_block_private" {
   type        = string
   default     = "10.0.128.0/17"
 }
-
-variable "internet_gateway_id" {
-  description = "The ID of the Internet Gateway for the VPC"
-  type        = string
-}
