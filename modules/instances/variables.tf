@@ -3,6 +3,11 @@ variable "instance_type" {
   default = "t3.micro"
 }
 
+variable "ec2_name" {
+  type    = string
+  default = "simlady_ec2"
+}
+
 variable "subnet_id" {
   type = string
 }

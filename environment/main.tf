@@ -27,10 +27,10 @@ module "network_acl" {
 module "rt_public" {
   source = "../modules/route_table"
 
-  vpc_id             = module.vpc.id
+  vpc_id              = module.vpc.id
   internet_gateway_id = module.igw.id
-  route_table_name   = "public-rt"
-  subnet_id          = module.subnets.public_subnet_id  
+  route_table_name    = "public-rt"
+  subnet_id           = module.subnets.public_subnet_id
 }
 
 module "rt_private" {
@@ -53,26 +53,64 @@ module "nat_gateway" {
 }
 
 //Recursos de computação
-# module "simlady_ec2_publica" {
-#   source             = "../modules/instances"
-#   subnet_id          = module.subnets.public_subnet_id
-#   security_group_ids = [module.public_security_group.id]
-# }
+module "simlady_ec2_publica" {
+  source              = "../modules/instances"
+  subnet_id           = module.subnets.public_subnet_id
+  security_group_ids  = [module.public_security_group.id]
+  associate_public_ip = true
+  ec2_name            = "simlady_ec2_publica"
+}
 
-# module "simlady_ec2_privada" {
-#   source             = "../modules/instances"
-#   subnet_id          = module.subnets.private_subnet_id
-#   security_group_ids = [module.private_security_group.id]
-# }
+module "simlady_ec2_privada" {
+  source              = "../modules/instances"
+  subnet_id           = module.subnets.private_subnet_id
+  security_group_ids  = [module.private_security_group.id]
+  associate_public_ip = false
+  ec2_name            = "simlady_ec2_privada"
+}
 
-# module "public_security_group" {
-#   source = "../modules/security_group"
-#   vpc_id = module.vpc.id
-# }
+module "public_security_group" {
+  source              = "../modules/security_group"
+  vpc_id              = module.vpc.id
+  security_group_name = "simlady_sg_publico"
 
-# module "private_security_group" {
-#   source = "../modules/security_group"
-#   vpc_id = module.vpc.id
-# }
+  ingress_rules = [
+    {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    {
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  ]
+}
 
+module "private_security_group" {
+  source              = "../modules/security_group"
+  vpc_id              = module.vpc.id
+  security_group_name = "simlady_sg_privado"
+  ingress_rules = [
+    {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = [var.vpc_cdir_block]
+    },
+    {
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = [var.vpc_cdir_block]
+    }
+  ]
+}
+
+module "ssh_key" {
+  source = "../modules/ssh_key"
+}
 
