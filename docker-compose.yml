@@ -2,6 +2,7 @@ services:
   frontend:
     image: giobels/simlady-stock:latest
     container_name: simlady-stock-frontend
+    hostname: frontend
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -14,6 +15,7 @@ services:
   backend:
     image: giobels/simlady-backend:latest
     container_name: simlady-backend
+    hostname: backend
     restart: unless-stopped
     ports:
       - "8000:8000"
@@ -41,6 +43,7 @@ services:
   ia:
     image: giobels/simlady-pypdf:latest
     container_name: simlady-ia
+    hostname: ia
     restart: unless-stopped
     ports:
       - "30000:30000"
@@ -55,6 +58,7 @@ services:
   postgres:
     image: postgres:17
     container_name: postgres
+    hostname: postgres
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -67,6 +71,7 @@ services:
   rabbitmq:
     image: rabbitmq:3.12-management
     container_name: rabbitmq
+    hostname: rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -82,6 +87,7 @@ services:
   bot:
     image: giobels/simlady-bot:latest
     container_name: simlady-bot
+    hostname: bot
     restart: unless-stopped
     ports:
       - "8084:8084"
