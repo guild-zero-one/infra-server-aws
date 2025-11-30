@@ -19,19 +19,24 @@ services:
       - "8000:8000"
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}"
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
       SPRING_RABBITMQ_HOST: ${SPRING_RABBITMQ_HOST}
       SPRING_RABBITMQ_PORT: ${SPRING_RABBITMQ_PORT}
       SPRING_RABBITMQ_USERNAME: ${SPRING_RABBITMQ_USERNAME}
       SPRING_RABBITMQ_PASSWORD: ${SPRING_RABBITMQ_PASSWORD}
-      POSTGRESQL_URL: "jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}?user=${DB_USER}&password=${DB_PASSWORD}"
-      POSTGRESQL_USERNAME: ${DB_USER}
-      POSTGRESQL_PASSWORD: ${DB_PASSWORD}
       SYSADMIN_USER: ${SYSADMIN_USER}
       SYSADMIN_EMAIL: ${SYSADMIN_EMAIL}
       SYSADMIN_PASSWORD: ${SYSADMIN_PASSWORD}
     depends_on:
+      postgres17:
+        condition: service_started
       rabbitmq:
         condition: service_healthy
+    networks:
+      - pg-network
 
   ia:
     image: giobels/simlady-pypdf:latest
