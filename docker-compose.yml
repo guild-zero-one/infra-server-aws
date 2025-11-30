@@ -52,7 +52,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
 
-  postgres17:
+  postgres:
     image: postgres:17
     container_name: postgres17
     environment:
