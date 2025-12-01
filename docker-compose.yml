@@ -1,19 +1,4 @@
 services:
-  frontend:
-    image: giobels/simlady-stock:latest
-    container_name: simlady-stock-frontend
-    hostname: frontend
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      NEXT_PUBLIC_API_URL: "http://${HOST}:8000"
-      NEXT_PUBLIC_PDF_API_URL: "http://${HOST}:30000"
-      SERPAPI_API_KEY: ${SERPAPI_API_KEY}
-      JWT_SECRET: ${JWT_SECRET}
-    networks:
-      - pg-network
-
   backend:
     image: giobels/simlady-backend:latest
     container_name: simlady-backend

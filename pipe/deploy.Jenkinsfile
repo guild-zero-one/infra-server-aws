@@ -3,7 +3,9 @@ pipeline {
 
     environment {
         REPO_URL = 'https://github.com/guild-zero-one/infra-server-aws.git'
+        FRONT_URL = 'https://github.com/guild-zero-one/stock-client.git'
         DEPLOY_DIR = '/var/www/deploy'
+        FRONT_DIR = '${DEPLOY_DIR}/simlady-stock'
         BRANCH = 'main'
     }
 
@@ -22,6 +24,7 @@ pipeline {
                 sudo apt install maven -y
                 sudo apt install nodejs -y
                 sudo apt install npm -y
+                sudo npm install -g pm2
                 '''
             }
         }
@@ -53,6 +56,64 @@ pipeline {
             }
         }
 
+
+        stage('Clone/Update Frontend Repository') {
+            steps {
+                sh """
+                sudo mkdir -p ${DEPLOY_DIR}
+                sudo chown -R \$USER:\$USER ${DEPLOY_DIR}
+                cd ${DEPLOY_DIR}
+
+                if [ ! -d "simlady-stock" ]; then
+                    git clone ${FRONT_URL} simlady-stock
+                fi
+
+                cd simlady-stock
+                git fetch --all
+                git checkout ${BRANCH}
+                git pull origin ${BRANCH}
+                """
+            }
+        }
+
+        stage('Build and Run Next.js') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'SERPAPI_API_KEY', variable: 'SERPAPI_API_KEY'),
+                    string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET')
+                ]) {
+                    sh """
+                    cd ${FRONT_DIR}
+                    
+                    # Criar arquivo .env.local para o Next.js
+                    echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
+                    echo "NEXT_PUBLIC_GEMINI_API_URL=http://localhost:30000" >> .env.local
+                    echo "SERPAPI_API_KEY=\$SERPAPI_API_KEY" >> .env.local
+                    echo "JWT_SECRET=\$JWT_SECRET" >> .env.local
+                    
+                    # Instalar dependências
+                    npm install
+                    
+                    # Buildar a aplicação Next.js
+                    npm run build
+                    
+                    # Parar o processo anterior se existir
+                    pm2 stop simlady-stock || true
+                    pm2 delete simlady-stock || true
+                    
+                    # Iniciar o Next.js com PM2
+                    pm2 start npm --name "simlady-stock" -- start
+                    
+                    # Salvar a configuração do PM2
+                    pm2 save
+                    
+                    # Configurar PM2 para iniciar no boot
+                    pm2 startup || true
+                    """
+                }
+            }
+        }
+
         stage('Create .env file') {
             steps {
                 withCredentials([
@@ -73,7 +134,6 @@ pipeline {
                     string(credentialsId: 'SYSADMIN_USER', variable: 'SYSADMIN_USER'),
                     string(credentialsId: 'SYSADMIN_EMAIL', variable: 'SYSADMIN_EMAIL'),
                     string(credentialsId: 'SYSADMIN_PASSWORD', variable: 'SYSADMIN_PASSWORD'),
-                    string(credentialsId: 'HOST', variable: 'HOST')
                 ]) {
                     sh """
                     cd ${DEPLOY_DIR}
@@ -95,7 +155,6 @@ SPRING_RABBITMQ_PASSWORD=${SPRING_RABBITMQ_PASSWORD}
 SYSADMIN_USER=${SYSADMIN_USER}
 SYSADMIN_EMAIL=${SYSADMIN_EMAIL}
 SYSADMIN_PASSWORD=${SYSADMIN_PASSWORD}
-HOST=${HOST}
 EOF
                     chmod 600 .env
                     """
