@@ -23,6 +23,8 @@ resource "aws_instance" "simlady_ec2" {
   key_name                    = var.key_name
   associate_public_ip_address = var.associate_public_ip
 
+  user_data = var.user_data_script != null ? var.user_data_script : null
+
   tags = {
     Name = var.ec2_name
   }

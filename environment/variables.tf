@@ -23,3 +23,14 @@ variable "vpc_cdir_block_private" {
   type        = string
   default     = "10.0.128.0/17"
 }
+
+variable "db_username" {
+  description = "Username for the Postgres database"
+  type        = string
+}
+
+variable "db_password" {
+  description = "Password for the Postgres database"
+  type        = string
+  sensitive   = true
+}

@@ -25,3 +25,9 @@ variable "associate_public_ip" {
   type    = bool
   default = true
 }
+
+variable "user_data_script" {
+  type        = string
+  description = "Script de user data para inicialização da instância"
+  default     = null
+}

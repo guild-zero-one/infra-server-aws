@@ -61,12 +61,34 @@ module "simlady_ec2_publica" {
   ec2_name            = "simlady_ec2_publica"
 }
 
-module "simlady_ec2_privada" {
+module "simlady_ec2_privada_1" {
   source              = "../modules/instances"
   subnet_id           = module.subnets.private_subnet_id
   security_group_ids  = [module.private_security_group.id]
   associate_public_ip = false
-  ec2_name            = "simlady_ec2_privada"
+  ec2_name            = "simlady_ec2_privada_1"
+
+  depends_on = [module.postgres_db]
+  user_data_script = <<-EOF
+    #!/bin/bash
+    echo "Instância inicializada com user data script" > /home/ubuntu/user_data_log.txt
+    echo "DB_HOST=${module.postgres_db.endpoint}" >> /etc/environment
+    EOF
+}
+
+module "simlady_ec2_privada_2" {
+  source              = "../modules/instances"
+  subnet_id           = module.subnets.private_subnet_id
+  security_group_ids  = [module.private_security_group.id]
+  associate_public_ip = false
+  ec2_name            = "simlady_ec2_privada_2"
+
+  depends_on = [module.postgres_db]
+  user_data_script = <<-EOF
+    #!/bin/bash
+    echo "Instância inicializada com user data script" > /home/ubuntu/user_data_log.txt
+    echo "DB_HOST=${module.postgres_db.endpoint}" >> /etc/environment
+    EOF
 }
 
 module "public_security_group" {
@@ -113,4 +135,34 @@ module "private_security_group" {
 module "ssh_key" {
   source = "../modules/ssh_key"
 }
+
+// Recursos de banco de dados
+module "postgres_db" {
+  source             = "../modules/postgres_db"
+  name               = "simlady-db"
+  vpc_id             = module.vpc.id
+  subnet_ids         = [module.subnets.private_subnet_id]
+  security_group_ids = module.private_security_group.id
+  db_name            = "simladydb"
+  username           = var.db_username
+  password           = var.db_password
+  
+}
+
+module "db_security_group" {
+  source              = "../modules/security_group"
+  vpc_id              = module.vpc.id
+  security_group_name = "simlady_db_sg"
+
+  ingress_rules = [
+    {
+      from_port   = 5432
+      to_port     = 5432
+      protocol    = "tcp"
+      cidr_blocks = [var.vpc_cdir_block_private]
+    }
+  ]
+  
+}
+
 
