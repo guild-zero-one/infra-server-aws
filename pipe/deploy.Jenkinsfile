@@ -72,7 +72,8 @@ pipeline {
                     string(credentialsId: 'SPRING_RABBITMQ_PASSWORD', variable: 'SPRING_RABBITMQ_PASSWORD'),
                     string(credentialsId: 'SYSADMIN_USER', variable: 'SYSADMIN_USER'),
                     string(credentialsId: 'SYSADMIN_EMAIL', variable: 'SYSADMIN_EMAIL'),
-                    string(credentialsId: 'SYSADMIN_PASSWORD', variable: 'SYSADMIN_PASSWORD')
+                    string(credentialsId: 'SYSADMIN_PASSWORD', variable: 'SYSADMIN_PASSWORD'),
+                    string(credentialsId: 'HOST', variable: 'HOST')
                 ]) {
                     sh """
                     cd ${DEPLOY_DIR}
@@ -94,6 +95,7 @@ SPRING_RABBITMQ_PASSWORD=${SPRING_RABBITMQ_PASSWORD}
 SYSADMIN_USER=${SYSADMIN_USER}
 SYSADMIN_EMAIL=${SYSADMIN_EMAIL}
 SYSADMIN_PASSWORD=${SYSADMIN_PASSWORD}
+HOST=${HOST}
 EOF
                     chmod 600 .env
                     """
