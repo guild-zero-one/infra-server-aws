@@ -20,6 +20,7 @@ services:
       SYSADMIN_USER: ${SYSADMIN_USER}
       SYSADMIN_EMAIL: ${SYSADMIN_EMAIL}
       SYSADMIN_PASSWORD: ${SYSADMIN_PASSWORD}
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
     depends_on:
       postgres:
         condition: service_started
