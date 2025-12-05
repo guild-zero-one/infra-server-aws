@@ -50,6 +50,7 @@ services:
     image: postgres:17
     container_name: postgres
     hostname: postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -63,6 +64,7 @@ services:
     image: rabbitmq:3.12-management
     container_name: rabbitmq
     hostname: rabbitmq
+    restart: unless-stopped
     ports:
       - "5672:5672"
       - "15672:15672"
