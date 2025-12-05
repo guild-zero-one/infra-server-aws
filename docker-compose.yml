@@ -21,6 +21,7 @@ services:
       SYSADMIN_EMAIL: ${SYSADMIN_EMAIL}
       SYSADMIN_PASSWORD: ${SYSADMIN_PASSWORD}
       SERVER_FORWARD_HEADERS_STRATEGY: framework
+      INITIALIZE_DATA: "true"
     depends_on:
       postgres:
         condition: service_started
