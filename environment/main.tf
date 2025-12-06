@@ -9,6 +9,7 @@ module "subnets" {
   vpc_id                 = module.vpc.id
   vpc_cdir_block_public  = var.vpc_cdir_block_public
   vpc_cdir_block_private = var.vpc_cdir_block_private
+  vpc_cdir_block_private_b = var.vpc_cdir_block_private_b
 }
 
 module "igw" {
@@ -40,6 +41,15 @@ module "rt_private" {
   nat_gateway_id   = module.nat_gateway.id
   route_table_name = "private-rt"
   subnet_id        = module.subnets.private_subnet_id
+}
+
+module "rt_private_b" {
+  source = "../modules/route_table"
+
+  vpc_id           = module.vpc.id
+  nat_gateway_id   = module.nat_gateway.id
+  route_table_name = "private-rt-b"
+  subnet_id        = module.subnets.private_subnet_b_id
 }
 
 module "nat_gateway" {
@@ -141,11 +151,12 @@ module "postgres_db" {
   source             = "../modules/postgres_db"
   name               = "simlady-db"
   vpc_id             = module.vpc.id
-  subnet_ids         = [module.subnets.private_subnet_id]
+  subnet_ids         = [module.subnets.private_subnet_id, module.subnets.private_subnet_b_id]
   security_group_ids = module.private_security_group.id
   db_name            = "simladydb"
   username           = var.db_username
   password           = var.db_password
+  engine_version    = "15"
   
 }
 

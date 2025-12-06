@@ -18,3 +18,14 @@ resource "aws_subnet" "private_subnet" {
     Name = "private-subnet"
   }
 }
+
+resource "aws_subnet" "private_subnet_b" {
+  vpc_id            = var.vpc_id
+  cidr_block        = var.vpc_cdir_block_private_b
+  availability_zone = "us-east-1b"
+
+  tags = {
+    Name = "private-subnet-b"
+  }
+}
+

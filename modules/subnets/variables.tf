@@ -14,3 +14,10 @@ variable "vpc_cdir_block_private" {
   type        = string
   default     = "10.0.128.0/17"
 }
+
+
+variable "vpc_cdir_block_private_b" {
+  description = "The CIDR block for the private subnet b"
+  type        = string
+  default     = "10.0.128.0/17"
+}
