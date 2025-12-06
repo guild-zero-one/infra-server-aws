@@ -1,10 +1,6 @@
-data "aws_vpc" "selected" {
-  id = var.vpc_id
-}
-
 resource "aws_subnet" "public_subnet" {
   vpc_id                  = var.vpc_id
-  cidr_block              = cidrsubnet(data.aws_vpc.selected.cidr_block, 8, 1)
+  cidr_block              = var.vpc_cdir_block_public
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
 
@@ -15,10 +11,21 @@ resource "aws_subnet" "public_subnet" {
 
 resource "aws_subnet" "private_subnet" {
   vpc_id            = var.vpc_id
-  cidr_block        = cidrsubnet(data.aws_vpc.selected.cidr_block, 8, 2)
-  availability_zone = "us-east-1b"
+  cidr_block        = var.vpc_cdir_block_private
+  availability_zone = "us-east-1a"
 
   tags = {
     Name = "private-subnet"
   }
 }
+
+resource "aws_subnet" "private_subnet_b" {
+  vpc_id            = var.vpc_id
+  cidr_block        = var.vpc_cdir_block_private_b
+  availability_zone = "us-east-1b"
+
+  tags = {
+    Name = "private-subnet-b"
+  }
+}
+
