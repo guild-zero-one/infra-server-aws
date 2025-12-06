@@ -121,7 +121,6 @@ pipeline {
                     string(credentialsId: 'JWT_SECRET', variable: 'JWT_SECRET'),
                     string(credentialsId: 'GEMINI_API_KEY', variable: 'GEMINI_API_KEY'),
                     string(credentialsId: 'BOT_TOKEN', variable: 'BOT_TOKEN'),
-                    string(credentialsId: 'DB_HOST', variable: 'DB_HOST'),
                     string(credentialsId: 'DB_PORT', variable: 'DB_PORT'),
                     string(credentialsId: 'DB_USER', variable: 'DB_USER'),
                     string(credentialsId: 'DB_PASSWORD', variable: 'DB_PASSWORD'),
@@ -142,7 +141,7 @@ SERPAPI_API_KEY=${SERPAPI_API_KEY}
 JWT_SECRET=${JWT_SECRET}
 GEMINI_API_KEY=${GEMINI_API_KEY}
 BOT_TOKEN=${BOT_TOKEN}
-DB_HOST=${DB_HOST}
+DB_HOST=/$DB_HOST
 DB_PORT=${DB_PORT}
 DB_USER=${DB_USER}
 DB_PASSWORD=${DB_PASSWORD}

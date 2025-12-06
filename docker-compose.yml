@@ -23,12 +23,8 @@ services:
       SERVER_FORWARD_HEADERS_STRATEGY: framework
       INITIALIZE_DATA: "true"
     depends_on:
-      postgres:
-        condition: service_started
       rabbitmq:
         condition: service_healthy
-    networks:
-      - pg-network
 
   ia:
     image: giobels/simlady-pypdf:latest
@@ -44,22 +40,6 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-    networks:
-      - pg-network
-
-  postgres:
-    image: postgres:17
-    container_name: postgres
-    hostname: postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5432:5432"
-    networks:
-      - pg-network
 
   rabbitmq:
     image: rabbitmq:3.12-management
@@ -93,6 +73,16 @@ services:
       SPRING_RABBITMQ_PASSWORD: ${SPRING_RABBITMQ_PASSWORD}
       BOT_TOKEN: ${BOT_TOKEN}
 
-networks:
-  pg-network:
-    driver: bridge
+  # postgres:
+  #   image: postgres:17
+  #   container_name: postgres
+  #   hostname: postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: ${DB_NAME}
+  #     POSTGRES_USER: ${DB_USER}
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - pg-network
